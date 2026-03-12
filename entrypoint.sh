@@ -4,6 +4,10 @@ set -e
 # Generate SSH host keys if they are missing
 ssh-keygen -A
 
+# Ensure .ssh dir exists (important when /root is a mounted volume)
+mkdir -p /root/.ssh
+chmod 700 /root/.ssh
+
 # Check if a GitHub user is provided to set up SSH access
 if [ -n "$GITHUB_USER" ]; then
     echo "GitHub user '$GITHUB_USER' provided. Fetching SSH public keys..."

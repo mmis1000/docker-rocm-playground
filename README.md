@@ -46,12 +46,32 @@ docker run -d \
   ghcr.io/mmis1000/rocm-amd-playground:latest
 ```
 
+To persist files across container recreates, mount a host directory to `/root`:
+
+```bash
+docker run -d \
+  --name rocm-playground \
+  --privileged \
+  --device=/dev/kfd \
+  --device=/dev/dri \
+  --group-add video \
+  --group-add render \
+  --security-opt seccomp=unconfined \
+  -e GITHUB_USER="your-github-username" \
+  -p 2222:22 \
+  -v /mnt/user/appdata/rocm-playground:/root \
+  ghcr.io/mmis1000/rocm-amd-playground:latest
+```
+
+SSH keys are fetched from GitHub and written into the mounted `/root/.ssh` on every startup, so SSH access works automatically even with a fresh mount.
+
 ### Unraid WebUI Template Mapping:
 If you are adding this via the Unraid "Add Container" WebUI, make sure to add the following parameters:
 
 * **Extra Parameters (Advanced View):** `--device=/dev/kfd --device=/dev/dri --group-add video --group-add render --security-opt seccomp=unconfined`
 * **Variable:** Name: `GITHUB_USER`, Key: `GITHUB_USER`, Value: `your-github-username`
 * **Port:** Host Port: `2222`, Container Port: `22`
+* **Path (optional):** Host Path: `/mnt/user/appdata/rocm-playground`, Container Path: `/root`
 
 ## 3. Testing Hardware Acceleration
 
