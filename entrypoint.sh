@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# /var/run/sshd may not survive across container restarts if /var/run is tmpfs
+mkdir -p /var/run/sshd
+
 # Generate SSH host keys if they are missing
 ssh-keygen -A
 
@@ -13,11 +16,17 @@ if [ -n "$GITHUB_USER" ]; then
     echo "GitHub user '$GITHUB_USER' provided. Fetching SSH public keys..."
     
     # Download public keys directly from GitHub
-    curl -sSLf "https://github.com/${GITHUB_USER}.keys" > /root/.ssh/authorized_keys
-    
+    if ! curl -sSLf "https://github.com/${GITHUB_USER}.keys" > /root/.ssh/authorized_keys; then
+        echo "ERROR: Failed to fetch SSH keys for GitHub user '${GITHUB_USER}'"
+        exit 1
+    fi
+
+    KEY_COUNT=$(wc -l < /root/.ssh/authorized_keys)
+    echo "Installed ${KEY_COUNT} SSH public key(s) for '${GITHUB_USER}'"
+
     # Ensure correct permissions, otherwise SSH daemon will reject the keys
     chmod 600 /root/.ssh/authorized_keys
-    
+
     echo "Starting OpenSSH server..."
     # Start SSH daemon in the background
     /usr/sbin/sshd
