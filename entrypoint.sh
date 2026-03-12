@@ -4,8 +4,23 @@ set -e
 # /var/run/sshd may not survive across container restarts if /var/run is tmpfs
 mkdir -p /var/run/sshd
 
-# Generate SSH host keys if they are missing
-ssh-keygen -A
+# Persist SSH host keys so clients don't get "host key changed" warnings
+# across container recreates. Keys are stored in /root/.ssh/host_keys/
+# which survives if /root is mounted as a volume.
+HOST_KEY_STORE=/root/.ssh/host_keys
+mkdir -p "$HOST_KEY_STORE"
+
+if [ -z "$(ls -A "$HOST_KEY_STORE" 2>/dev/null)" ]; then
+    # First run: generate keys and save to persistent store
+    ssh-keygen -A
+    cp /etc/ssh/ssh_host_* "$HOST_KEY_STORE/"
+    echo "Generated new SSH host keys (stored in $HOST_KEY_STORE)"
+else
+    # Subsequent runs: restore saved keys so clients see the same fingerprint
+    cp "$HOST_KEY_STORE"/ssh_host_* /etc/ssh/
+    chmod 600 /etc/ssh/ssh_host_*_key
+    echo "Restored SSH host keys from $HOST_KEY_STORE"
+fi
 
 # Ensure correct ownership and permissions on /root (critical when mounted as a volume —
 # sshd refuses key auth if the home directory is group- or world-writable)

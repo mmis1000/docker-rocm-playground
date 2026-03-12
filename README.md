@@ -65,6 +65,8 @@ docker run -d \
 
 SSH keys are fetched from GitHub and written into the mounted `/root/.ssh` on every startup, so SSH access works automatically even with a fresh mount.
 
+> **Tip — avoid "host key changed" warnings:** SSH host keys are automatically persisted to `/root/.ssh/host_keys/` on first start and restored on subsequent starts. As long as `/root` is mounted, your SSH client will always see the same host fingerprint and won't prompt you to update `known_hosts`.
+
 ### Unraid WebUI Template Mapping:
 If you are adding this via the Unraid "Add Container" WebUI, make sure to add the following parameters:
 
