@@ -2,12 +2,28 @@
 
 This Docker container provides a fully functional AMD ROCm environment with proper signal handling, SSH access, and FFmpeg hardware acceleration debugging tools.
 
-## 1. Building the Image
+## 1. Getting the Image
 
-If you are building this image directly on your Unraid server via SSH or a local machine to push to a registry:
+### Option A: Pull from GitHub Container Registry (recommended)
+
+Pre-built images are published automatically via GitHub Actions:
 
 ```bash
-docker build -t my-rocm-playground .
+docker pull ghcr.io/mmis1000/rocm-amd-playground:latest
+```
+
+To pull a specific ROCm/Ubuntu version:
+
+```bash
+docker pull ghcr.io/mmis1000/rocm-amd-playground:ubuntu24.04-rocm7.2
+```
+
+### Option B: Build Locally
+
+If you want to build the image yourself:
+
+```bash
+docker build -t rocm-amd-playground .
 ```
 
 ## 2. Deploying on Unraid
@@ -27,7 +43,7 @@ docker run -d \
   --security-opt seccomp=unconfined \
   -e GITHUB_USER="your-github-username" \
   -p 2222:22 \
-  my-rocm-playground
+  ghcr.io/mmis1000/rocm-amd-playground:latest
 ```
 
 ### Unraid WebUI Template Mapping:
