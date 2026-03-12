@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     mesa-va-drivers \
     libva-drm2 \
     pciutils \
+    wget \
+    less \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Setup SSH directory privileges
