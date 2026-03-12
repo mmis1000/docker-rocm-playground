@@ -7,6 +7,11 @@ mkdir -p /var/run/sshd
 # Generate SSH host keys if they are missing
 ssh-keygen -A
 
+# Ensure correct ownership and permissions on /root (critical when mounted as a volume —
+# sshd refuses key auth if the home directory is group- or world-writable)
+chown root:root /root
+chmod 750 /root
+
 # Ensure .ssh dir exists (important when /root is a mounted volume)
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
