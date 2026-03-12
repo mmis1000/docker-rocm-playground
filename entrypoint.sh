@@ -28,8 +28,8 @@ if [ -n "$GITHUB_USER" ]; then
     chmod 600 /root/.ssh/authorized_keys
 
     echo "Starting OpenSSH server..."
-    # Start SSH daemon in the background
-    /usr/sbin/sshd
+    # Start SSH daemon, log to stderr so 'docker logs' captures it
+    /usr/sbin/sshd -E /proc/1/fd/2
 else
     echo "No GITHUB_USER environment variable provided. SSH server will NOT be started."
 fi
